@@ -1,84 +1,64 @@
 // ----------------------------------------------------------------------------
 // BLANK.h  --  BASIS FOR ALL MODEMS
 //
-// Copyright (C) 2006
-//		Dave Freese, W1HKJ
+// Copyright (C) 2024
+//		Benjamin Cance, KC8BWS
 //
 // This file is part of fldigi.
 //
-// Fldigi is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Fldigi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with fldigi.  If not, see <http://www.gnu.org/licenses/>.
+// Fldigi-Improved is free software: you can redistribute it and/or modify
+// it under the terms of the MIT License.
 // ----------------------------------------------------------------------------
 
-#ifndef _BLANK_H
-#define _BLANK_H
+#ifndef BLANK_H
+#define BLANK_H
 
+#include <memory>
+#include <array>
 #include "trx.h"
 #include "modem.h"
 #include "fft.h"
 #include "filters.h"
 #include "complex.h"
 
-#define	BLANKSampleRate	8000
-#define	SYMLEN			512
-#define BLANK_BW		100
+constexpr int BLANK_SAMPLE_RATE = 8000;
+constexpr int SYM_LEN = 512;
+constexpr int BLANK_BW = 100;
 
-#define BUFFLEN			4096
-#define SCOPE_DATA_LEN	1024
-
-// lp filter
-//#define	DEC_1		8		
-//#define FIRLEN_1	256
-//#define BW_1		10
-
-// NASA coefficients for viterbi encode/decode algorithms
-//#define	K	7
-//#define	POLY1	0x6d
-//#define	POLY2	0x4f
-
+constexpr int BUFF_LEN = 4096;
+constexpr int SCOPE_DATA_LEN = 1024;
 
 class BLANK : public modem {
 protected:
-	double			phaseacc;
-	double			phaseincr;
+    double phaseacc;
+    double phaseincr;
 
-	C_FIR_filter	*bandpass;
-	C_FIR_filter	*lowpass;
-	C_FIR_filter	*hilbert;
-	Cmovavg			*moving_avg;
-	sfft			*slidingfft;
+    std::unique_ptr<C_FIR_filter> bandpass;
+    std::unique_ptr<C_FIR_filter> lowpass;
+    std::unique_ptr<C_FIR_filter> hilbert;
+    std::unique_ptr<Cmovavg> moving_avg;
+    std::unique_ptr<sfft> slidingfft;
 
-	int				symlen;
-// receive
-	double			*scope_data;
-	double			*inbuf;
-// transmit
-	int txstate;
+    int symlen;
+    // receive
+    std::array<double, SCOPE_DATA_LEN> scope_data;
+    std::array<double, BUFF_LEN> inbuf;
+    // transmit
+    int txstate;
 
-	double			*outbuf;
-	unsigned int	buffptr;
+    std::array<double, SYM_LEN> outbuf;
+    unsigned int buffptr;
 
 public:
-	BLANK();
-	~BLANK();
-	void	init();
-	void	rx_init();
-	void	tx_init(SoundBase *sc);
-	void 	restart();
-	int		rx_process(const double *buf, int len);
-	int		tx_process();
-	void	update_syncscope();
-
+    BLANK();
+    ~BLANK() override;
+    void init() override;
+    void rx_init() override;
+    void tx_init(SoundBase *sc) override;
+    void restart() override;
+    int rx_process(const double *buf, int len) override;
+    int tx_process() override;
+    void update_syncscope();
 };
 
 #endif
