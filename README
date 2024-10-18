@@ -1,3 +1,13 @@
+## KC8BWS' Notes
+
+1. I'm working on improving this because most updates are quite old
+2. My goals are:
+  a. Modernize to C11++ throughout
+  b. Threading Support
+  c. Fix the bugs along the way citing the original Issues along the way!
+
+
+## Original Readme
 Fldigi is a software modem for Amateur Radio use. It is a sound card based
 program that is used for both transmitting and receiving data in any of the
 following modes:
